@@ -47,8 +47,13 @@
           <details class="optional-details"><summary>その他の記録</summary>
             <div class="field-grid two-columns details-body"><label class="field"><span>体重</span><span class="number-field"><input id="weight" type="number" min="20" max="250" step="0.1" placeholder="任意"><em>kg</em></span></label><label class="field"><span>白血球数</span><span class="number-field"><input id="wbc" type="number" min="0" max="100000" step="100" placeholder="任意"><em>/mm³</em></span></label></div>
             <label class="toggle-field"><input id="medicationTaken" type="checkbox" checked><span><b>処方薬を指示どおり使用した</b></span></label>
-            <label class="field"><span>メモ</span><textarea id="notes" rows="3" maxlength="300" placeholder="食事、体調の変化、受診時に伝えたいことなど"></textarea></label>
           </details>
+        </article>
+
+        <article class="card form-card memo-card">
+          <div class="card-heading"><span class="step">3</span><div><h3>メモ</h3><p>診察時の相談と自分用を分けて保存</p></div></div>
+          <label class="field memo-field"><span>医師に伝えるメモ <small>診察時に見せられます</small></span><textarea id="doctorMemo" rows="4" maxlength="1000" placeholder="例：3日前から血便が増えた／夜中に2回起きる／薬について確認したいこと"></textarea></label>
+          <label class="field memo-field"><span>自分用メモ <small>食事・生活・気づきなど</small></span><textarea id="personalMemo" rows="4" maxlength="1000" placeholder="例：外食後に腹痛あり／睡眠不足／仕事のストレスが強かった"></textarea></label>
         </article>
 
         <article class="card urgent-check"><div class="card-heading"><span class="step danger">!</span><div><h3>見逃したくない症状</h3><p>当てはまるものを選択</p></div></div><div class="check-list">
@@ -59,6 +64,15 @@
         </div></article>
 
         <section class="result-card" id="resultCard" aria-live="polite"><div><p class="eyebrow">TODAY'S GUIDE</p><h2 id="resultTitle">入力範囲では軽症寄り</h2><p id="resultSummary">便回数だけでなく、血便・発熱・脈拍・検査値を合わせて確認します。</p></div><div class="result-actions"><span class="status-chip" id="severityChip">参考判定</span><button class="primary-button" type="submit">今日の記録を保存</button></div></section>
+        <article class="card criteria-panel">
+          <div class="card-heading"><div><h3>軽症・中等症・重症の基準</h3><p>厚生労働省の臨床的重症度分類をわかりやすく表示</p></div></div>
+          <div class="criteria-list">
+            <div class="criterion-level mild" data-criterion-level="mild"><b>軽症</b><p>排便4回/日以下、血便なし〜わずか、37.5℃未満、脈拍90未満、Hb 10g/dL超、赤沈正常またはCRP 3.0mg/dL未満をすべて満たす。</p></div>
+            <div class="criterion-level moderate" data-criterion-level="moderate"><b>中等症</b><p>軽症と重症の中間。排便5回/日以上、明らかな血便、37.5℃以上、脈拍90以上、Hb 10以下、赤沈30以上またはCRP 3.0以上のいずれかがあり、重症基準を満たさない。</p></div>
+            <div class="criterion-level severe" data-criterion-level="severe"><b>重症</b><p>排便6回/日以上かつ便の大部分が血液で、発熱または頻脈があり、6項目中4項目以上を満たす。</p></div>
+          </div>
+          <p class="criteria-note">検査項目が未入力の場合は参考判定です。正式な重症度は医師が判断します。</p>
+        </article>
       </form>
     </section>
 
@@ -68,7 +82,7 @@
 
     <section class="tab-panel" id="guide"><div class="section-heading"><div><p class="eyebrow">SEVERITY GUIDE</p><h2>重症度の目安</h2></div></div>
       <article class="answer-card"><p class="eyebrow">よくある疑問</p><h3>何回下痢したら中等症？</h3><p><strong>排便が1日5回以上</strong>は中等症の基準の1項目ですが、便回数だけでは確定しません。血便、発熱、脈拍、貧血、CRPまたは赤沈を合わせて医師が判断します。</p></article>
-      <div class="severity-grid"><article class="severity-card mild"><span>軽症</span><h3>4回/日以下</h3><p>血便はなし〜わずかで、発熱・頻脈・強い貧血・炎症反応上昇がない。</p></article><article class="severity-card moderate"><span>中等症</span><h3>軽症と重症の中間</h3><p>5回/日以上、明らかな血便、37.5℃以上、脈拍90以上、Hb 10以下、CRP 3.0以上または赤沈30以上のいずれか。</p></article><article class="severity-card severe"><span>重症</span><h3>複数条件で判断</h3><p>6回/日以上かつ便の大部分が血液で、発熱または頻脈を含め、6項目中4項目以上。</p></article></div>
+      <div class="severity-grid"><article class="severity-card mild"><span>軽症</span><h3>6項目すべてが軽症側</h3><ul><li>排便4回/日以下</li><li>血便なし〜わずか</li><li>体温37.5℃未満</li><li>脈拍90回/分未満</li><li>Hb 10g/dL超</li><li>赤沈正常またはCRP 3.0未満</li></ul></article><article class="severity-card moderate"><span>中等症</span><h3>軽症と重症の中間</h3><ul><li>排便5回/日以上</li><li>明らかな血便</li><li>体温37.5℃以上</li><li>脈拍90回/分以上</li><li>Hb 10g/dL以下</li><li>赤沈30以上またはCRP 3.0以上</li></ul><p>いずれかに該当し、重症基準を満たさない場合。</p></article><article class="severity-card severe"><span>重症</span><h3>複数条件が重なる</h3><ul><li>排便6回/日以上</li><li>便の大部分が血液</li><li>発熱または頻脈あり</li><li>6項目中4項目以上</li></ul><p>当日中に主治医・IBD外来へ連絡する目安です。</p></article></div>
       <article class="card contact-guide"><h3>受診・連絡の目安</h3><div class="contact-row emergency"><b>今すぐ相談・救急</b><p>止まらない多量出血、強い腹痛と腹部膨満、水分がとれない、意識が遠のくなど。</p></div><div class="contact-row same-day"><b>当日中に主治医へ</b><p>重症の目安、急な悪化、高熱、血便を伴う頻回便、強い脱水感があるとき。</p></div><div class="contact-row soon"><b>早めに相談</b><p>症状悪化が数日続く、血便が再び出た、普段より排便が増えた、夜間排便が続くとき。</p></div><a class="call-button" id="careTeamLink" hidden><span>登録した連絡先へ電話</span><b id="careTeamNumber"></b></a></article>
       <article class="sources"><h3>判定の根拠</h3><p>厚生労働省の指定難病に用いられる臨床的重症度分類を参考にしています。実際の活動性・寛解は、症状だけでなく内視鏡所見や炎症マーカーなどを含めて医師が評価します。</p><ul><li><a href="https://www.nanbyou.or.jp/entry/218" target="_blank" rel="noreferrer">難病情報センター：潰瘍性大腸炎（指定難病97）</a></li><li><a href="https://www.jsibd.jp/wp-content/uploads/2025/04/117f84a076b4426ce06ec226305043df.pdf" target="_blank" rel="noreferrer">日本炎症性腸疾患協会：潰瘍性大腸炎ってなんだろう？</a></li><li><a href="https://gi.org/journals-publications/ebgi/alkazzi_aug2025/" target="_blank" rel="noreferrer">American College of Gastroenterology：2025 UC guideline summary</a></li></ul><p class="updated">医療情報確認：2026年7月</p></article>
     </section>

@@ -6,7 +6,7 @@ let records=loadJson(STORAGE_KEY,[]),settings=loadJson(SETTINGS_KEY,{baselineSto
 
 function loadJson(key,fallback){try{return JSON.parse(localStorage.getItem(key))??fallback}catch{return fallback}}
 function saveJson(key,value){localStorage.setItem(key,JSON.stringify(value))}
-function getFormData(){return{date:$("#recordDate").value,stoolCount:Number($("#stoolCount").value||0),looseCount:Number($("#looseCount").value||0),blood:Number($("input[name='blood']:checked").value),urgency:Number($("#urgency").value),nocturnal:$("#nocturnal").checked,temperature:numberOrNull($("#temperature").value),pulse:numberOrNull($("#pulse").value),pain:Number($("#pain").value),hb:numberOrNull($("#hb").value),crp:numberOrNull($("#crp").value),esr:numberOrNull($("#esr").value),weight:numberOrNull($("#weight").value),wbc:numberOrNull($("#wbc").value),medicationTaken:$("#medicationTaken").checked,notes:$("#notes").value.trim(),redFlags:$$('[data-red-flag]:checked').map(e=>e.value),updatedAt:new Date().toISOString()}}
+function getFormData(){return{date:$("#recordDate").value,stoolCount:Number($("#stoolCount").value||0),looseCount:Number($("#looseCount").value||0),blood:Number($("input[name='blood']:checked").value),urgency:Number($("#urgency").value),nocturnal:$("#nocturnal").checked,temperature:numberOrNull($("#temperature").value),pulse:numberOrNull($("#pulse").value),pain:Number($("#pain").value),hb:numberOrNull($("#hb").value),crp:numberOrNull($("#crp").value),esr:numberOrNull($("#esr").value),weight:numberOrNull($("#weight").value),wbc:numberOrNull($("#wbc").value),medicationTaken:$("#medicationTaken").checked,doctorMemo:$("#doctorMemo").value.trim(),personalMemo:$("#personalMemo").value.trim(),redFlags:$$('[data-red-flag]:checked').map(e=>e.value),updatedAt:new Date().toISOString()}}
 
 function assessSeverity(r){
   const flags={bowel:r.stoolCount>=5,blood:r.blood>=2,fever:r.temperature!==null&&r.temperature>=37.5,tachycardia:r.pulse!==null&&r.pulse>=90,anemia:r.hb!==null&&r.hb<=10,inflammation:(r.crp!==null&&r.crp>=3)||(r.esr!==null&&r.esr>=30)};
@@ -20,7 +20,7 @@ function assessSeverity(r){
   return{level:"mild",title:"入力範囲では軽症寄り",chip:incomplete?"検査未入力あり":"軽症の目安",summary:incomplete?"入力された症状は軽症側です。ただし未入力の検査項目があり、寛解を確定するものではありません。":"入力された6項目は軽症側です。症状が続く場合や不安がある場合は主治医へ相談してください。",flags}
 }
 
-function updateLiveResult(){const r=assessSeverity(getFormData()),card=$("#resultCard");card.classList.toggle("warning",r.level==="moderate");card.classList.toggle("danger",["severe","emergency"].includes(r.level));$("#resultTitle").textContent=r.title;$("#resultSummary").textContent=r.summary;$("#severityChip").textContent=r.chip}
+function updateLiveResult(){const r=assessSeverity(getFormData()),card=$("#resultCard");card.classList.toggle("warning",r.level==="moderate");card.classList.toggle("danger",["severe","emergency"].includes(r.level));$("#resultTitle").textContent=r.title;$("#resultSummary").textContent=r.summary;$("#severityChip").textContent=r.chip;const activeLevel=r.level==="emergency"?"severe":r.level;$$('[data-criterion-level]').forEach(el=>el.classList.toggle("is-current",el.dataset.criterionLevel===activeLevel))}
 function symptomScore(r){const base=Number(settings.baselineStools||0);return Math.max(0,r.stoolCount-base)*1.5+r.blood*3+r.urgency*1.3+r.pain*.45+(r.nocturnal?2:0)+(r.temperature>=37.5?2:0)}
 function assessTrend(items){
   if(items.length<3)return{level:"neutral",icon:"…",title:"あと少し記録が必要です",text:`経過判定には3日分以上の記録が必要です。現在${items.length}日分あります。`};
@@ -41,22 +41,23 @@ function renderTrend(){
 }
 
 function formatDate(v){const d=new Date(`${v}T00:00:00`);return{main:`${d.getMonth()+1}/${d.getDate()}`,sub:["日","月","火","水","木","金","土"][d.getDay()]+"曜日"}}
+function escapeHtml(value){return String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"})[char])}
 function renderHistory(){
   const list=$("#historyList");if(!records.length){list.innerHTML='<div class="empty-state"><b>まだ記録がありません</b>毎日の変化を残すと、診察時にも振り返りやすくなります。</div>';return}
-  list.innerHTML=[...records].sort((a,b)=>b.date.localeCompare(a.date)).map(r=>{const result=assessSeverity(r),d=formatDate(r.date),blood=["なし","わずか","明らか","多量"][r.blood],label=result.level==="mild"?"軽症寄り":result.level==="moderate"?"中等症項目":result.level==="severe"?"重症可能性":"緊急サイン";return`<article class="history-item"><div class="history-date">${d.main}<small>${d.sub}</small></div><div class="history-metrics"><span>便 <b>${r.stoolCount}回</b></span><span>血便 <b>${blood}</b></span><span>腹痛 <b>${r.pain}/10</b></span></div><span class="severity-label ${result.level}">${label}</span><button class="delete-record" data-delete="${r.date}" aria-label="${r.date}の記録を削除">削除</button></article>`}).join("");
+  list.innerHTML=[...records].sort((a,b)=>b.date.localeCompare(a.date)).map(r=>{const result=assessSeverity(r),d=formatDate(r.date),blood=["なし","わずか","明らか","多量"][r.blood],label=result.level==="mild"?"軽症寄り":result.level==="moderate"?"中等症項目":result.level==="severe"?"重症可能性":"緊急サイン",doctorMemo=r.doctorMemo??r.notes??"",personalMemo=r.personalMemo??"",hasMemo=doctorMemo||personalMemo;return`<article class="history-item"><div class="history-date">${d.main}<small>${d.sub}</small></div><div class="history-metrics"><span>便 <b>${r.stoolCount}回</b></span><span>血便 <b>${blood}</b></span><span>腹痛 <b>${r.pain}/10</b></span></div><span class="severity-label ${result.level}">${label}</span><button class="delete-record" data-delete="${r.date}" aria-label="${r.date}の記録を削除">削除</button>${hasMemo?`<details class="memo-details"><summary>メモを見る</summary>${doctorMemo?`<div><b>医師に伝えるメモ</b><p>${escapeHtml(doctorMemo)}</p></div>`:""}${personalMemo?`<div><b>自分用メモ</b><p>${escapeHtml(personalMemo)}</p></div>`:""}</details>`:""}</article>`}).join("");
   $$('[data-delete]').forEach(b=>b.addEventListener("click",()=>deleteRecord(b.dataset.delete)))
 }
 function deleteRecord(date){if(!confirm(`${date} の記録を削除しますか？`))return;records=records.filter(r=>r.date!==date);saveJson(STORAGE_KEY,records);renderAll();showToast("記録を削除しました")}
 function saveRecord(e){e.preventDefault();const r=getFormData();if(!r.date)return;const index=records.findIndex(i=>i.date===r.date);if(index>=0)records[index]=r;else records.push(r);saveJson(STORAGE_KEY,records);renderAll();showToast(index>=0?"記録を更新しました":"今日の記録を保存しました")}
 function exportCsv(){
   if(!records.length)return showToast("出力できる記録がありません");
-  const header=["日付","排便回数","水様泥状便","血便0-3","便意切迫0-3","夜間排便","体温","脈拍","腹痛0-10","Hb","CRP","赤沈","体重","白血球数","服薬","メモ"],rows=[...records].sort((a,b)=>a.date.localeCompare(b.date)).map(r=>[r.date,r.stoolCount,r.looseCount,r.blood,r.urgency,r.nocturnal?"あり":"なし",r.temperature??"",r.pulse??"",r.pain,r.hb??"",r.crp??"",r.esr??"",r.weight??"",r.wbc??"",r.medicationTaken?"はい":"いいえ",r.notes]),esc=v=>`"${String(v).replaceAll('"','""')}"`,csv="\uFEFF"+[header,...rows].map(row=>row.map(esc).join(",")).join("\r\n"),url=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"})),a=document.createElement("a");a.href=url;a.download=`UC症状記録_${todayString()}.csv`;a.click();URL.revokeObjectURL(url)
+  const header=["日付","排便回数","水様泥状便","血便0-3","便意切迫0-3","夜間排便","体温","脈拍","腹痛0-10","Hb","CRP","赤沈","体重","白血球数","服薬","医師に伝えるメモ","自分用メモ"],rows=[...records].sort((a,b)=>a.date.localeCompare(b.date)).map(r=>[r.date,r.stoolCount,r.looseCount,r.blood,r.urgency,r.nocturnal?"あり":"なし",r.temperature??"",r.pulse??"",r.pain,r.hb??"",r.crp??"",r.esr??"",r.weight??"",r.wbc??"",r.medicationTaken?"はい":"いいえ",r.doctorMemo??r.notes??"",r.personalMemo??""]),esc=v=>`"${String(v).replaceAll('"','""')}"`,csv="\uFEFF"+[header,...rows].map(row=>row.map(esc).join(",")).join("\r\n"),url=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"})),a=document.createElement("a");a.href=url;a.download=`UC症状記録_${todayString()}.csv`;a.click();URL.revokeObjectURL(url)
 }
 
 function loadRecordToForm(date){
   const r=records.find(i=>i.date===date);$("#dailyForm").reset();$("#recordDate").value=date;$("#medicationTaken").checked=true;
   if(!r){$("#painOutput").textContent="0 / 10";updateLiveResult();return}
-  ["stoolCount","looseCount","urgency","temperature","pulse","pain","hb","crp","esr","weight","wbc","notes"].forEach(k=>{if(r[k]!==null&&r[k]!==undefined)$(`#${k}`).value=r[k]});
+  ["stoolCount","looseCount","urgency","temperature","pulse","pain","hb","crp","esr","weight","wbc"].forEach(k=>{if(r[k]!==null&&r[k]!==undefined)$(`#${k}`).value=r[k]});$("#doctorMemo").value=r.doctorMemo??r.notes??"";$("#personalMemo").value=r.personalMemo??"";
   $(`input[name="blood"][value="${r.blood}"]`).checked=true;$("#nocturnal").checked=r.nocturnal;$("#medicationTaken").checked=r.medicationTaken;$$('[data-red-flag]').forEach(i=>i.checked=r.redFlags?.includes(i.value));$("#painOutput").textContent=`${r.pain} / 10`;updateLiveResult()
 }
 function renderSettings(){

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#176b62">
+  <meta name="description" content="潰瘍性大腸炎の症状を記録し、重症度と経過の目安を確認するセルフチェックアプリ">
+  <title>UCコンディションノート</title><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="app-header"><div class="brand"><span class="brand-mark">UC</span><div><p class="eyebrow">潰瘍性大腸炎セルフチェック</p><h1>コンディションノート</h1></div></div><button class="icon-button" id="openSettings" type="button" aria-label="設定を開く">⚙</button></header>
+  <main>
+    <section class="safety-note"><span>ⓘ</span><p><strong>診断アプリではありません。</strong>結果だけで薬を増減・中止せず、主治医の指示を優先してください。</p></section>
+    <nav class="tabs" aria-label="メインメニュー"><button class="tab is-active" data-tab="today" type="button">今日</button><button class="tab" data-tab="trend" type="button">経過</button><button class="tab" data-tab="history" type="button">記録</button><button class="tab" data-tab="guide" type="button">目安</button></nav>
+
+    <section class="tab-panel is-active" id="today">
+      <div class="section-heading"><div><p class="eyebrow">DAILY CHECK</p><h2>今日の状態</h2></div><input id="recordDate" type="date" aria-label="記録日"></div>
+      <form id="dailyForm">
+        <article class="card form-card">
+          <div class="card-heading"><span class="step">1</span><div><h3>便の状態</h3><p>直近24時間を入力</p></div></div>
+          <div class="field-grid two-columns">
+            <label class="field"><span>排便回数 <small>必須</small></span><span class="number-field"><input id="stoolCount" type="number" min="0" max="40" value="0" required><em>回/日</em></span></label>
+            <label class="field"><span>水様・泥状便</span><span class="number-field"><input id="looseCount" type="number" min="0" max="40" value="0"><em>回/日</em></span></label>
+          </div>
+          <fieldset class="field"><legend>目で見える血便</legend><div class="choice-grid">
+            <label><input type="radio" name="blood" value="0" checked><span><b>なし</b><small>（−）</small></span></label>
+            <label><input type="radio" name="blood" value="1"><span><b>わずか</b><small>半数以下に付着（＋）</small></span></label>
+            <label><input type="radio" name="blood" value="2"><span><b>明らか</b><small>ほぼ毎回混入（++）</small></span></label>
+            <label><input type="radio" name="blood" value="3"><span><b>多量</b><small>大部分が血液（+++）</small></span></label>
+          </div></fieldset>
+          <div class="field-grid two-columns">
+            <label class="field"><span>便意切迫感</span><select id="urgency"><option value="0">なし</option><option value="1">少しある</option><option value="2">強いが間に合う</option><option value="3">間に合わないことがある</option></select></label>
+            <label class="toggle-field"><input id="nocturnal" type="checkbox"><span><b>夜間の排便あり</b><small>便意で目が覚めた</small></span></label>
+          </div>
+        </article>
+
+        <article class="card form-card">
+          <div class="card-heading"><span class="step">2</span><div><h3>全身の状態</h3><p>わかる範囲で大丈夫です</p></div></div>
+          <div class="field-grid two-columns">
+            <label class="field"><span>体温</span><span class="number-field"><input id="temperature" type="number" min="34" max="43" step="0.1" placeholder="36.5"><em>℃</em></span></label>
+            <label class="field"><span>安静時脈拍</span><span class="number-field"><input id="pulse" type="number" min="30" max="220" placeholder="70"><em>回/分</em></span></label>
+          </div>
+          <label class="field range-field"><span>腹痛 <b id="painOutput">0 / 10</b></span><input id="pain" type="range" min="0" max="10" value="0"></label>
+          <div class="field-grid three-columns">
+            <label class="field"><span>Hb</span><span class="number-field"><input id="hb" type="number" min="2" max="25" step="0.1" placeholder="任意"><em>g/dL</em></span></label>
+            <label class="field"><span>CRP</span><span class="number-field"><input id="crp" type="number" min="0" max="100" step="0.01" placeholder="任意"><em>mg/dL</em></span></label>
+            <label class="field"><span>赤沈</span><span class="number-field"><input id="esr" type="number" min="0" max="200" step="1" placeholder="任意"><em>mm/h</em></span></label>
+          </div>
+          <details class="optional-details"><summary>その他の記録</summary>
+            <div class="field-grid two-columns details-body"><label class="field"><span>体重</span><span class="number-field"><input id="weight" type="number" min="20" max="250" step="0.1" placeholder="任意"><em>kg</em></span></label><label class="field"><span>白血球数</span><span class="number-field"><input id="wbc" type="number" min="0" max="100000" step="100" placeholder="任意"><em>/mm³</em></span></label></div>
+            <label class="toggle-field"><input id="medicationTaken" type="checkbox" checked><span><b>処方薬を指示どおり使用した</b></span></label>
+            <label class="field"><span>メモ</span><textarea id="notes" rows="3" maxlength="300" placeholder="食事、体調の変化、受診時に伝えたいことなど"></textarea></label>
+          </details>
+        </article>
+
+        <article class="card urgent-check"><div class="card-heading"><span class="step danger">!</span><div><h3>見逃したくない症状</h3><p>当てはまるものを選択</p></div></div><div class="check-list">
+          <label><input type="checkbox" data-red-flag value="heavyBleeding"><span>止まらない／便器が赤くなるほどの出血</span></label>
+          <label><input type="checkbox" data-red-flag value="severeDistension"><span>強い腹痛とお腹の張り</span></label>
+          <label><input type="checkbox" data-red-flag value="dehydration"><span>水分がとれない、尿が極端に少ない</span></label>
+          <label><input type="checkbox" data-red-flag value="fainting"><span>意識が遠のく、ふらついて立てない</span></label>
+        </div></article>
+
+        <section class="result-card" id="resultCard" aria-live="polite"><div><p class="eyebrow">TODAY'S GUIDE</p><h2 id="resultTitle">入力範囲では軽症寄り</h2><p id="resultSummary">便回数だけでなく、血便・発熱・脈拍・検査値を合わせて確認します。</p></div><div class="result-actions"><span class="status-chip" id="severityChip">参考判定</span><button class="primary-button" type="submit">今日の記録を保存</button></div></section>
+      </form>
+    </section>
+
+    <section class="tab-panel" id="trend"><div class="section-heading"><div><p class="eyebrow">7-DAY TREND</p><h2>最近の経過</h2></div></div><article class="card trend-summary" id="trendSummary"></article><article class="card"><div class="card-heading"><div><h3>排便回数と血便</h3><p>直近7件の記録</p></div></div><div id="trendChart" class="trend-chart"></div><div class="chart-legend"><span><i class="legend-stool"></i>排便回数</span><span><i class="legend-blood"></i>血便あり</span></div></article><article class="card insight-card"><h3>経過を見るポイント</h3><ul><li>排便回数が普段の寛解時に近づいているか</li><li>血便と便意切迫感が減っているか</li><li>夜間の排便、腹痛、発熱が改善しているか</li><li>症状がなくても、内視鏡・便中カルプロテクチン・CRPなどの評価は主治医と相談</li></ul></article></section>
+
+    <section class="tab-panel" id="history"><div class="section-heading"><div><p class="eyebrow">MY RECORDS</p><h2>記録一覧</h2></div><button class="secondary-button" id="exportCsv" type="button">CSV出力</button></div><div id="historyList" class="history-list"></div></section>
+
+    <section class="tab-panel" id="guide"><div class="section-heading"><div><p class="eyebrow">SEVERITY GUIDE</p><h2>重症度の目安</h2></div></div>
+      <article class="answer-card"><p class="eyebrow">よくある疑問</p><h3>何回下痢したら中等症？</h3><p><strong>排便が1日5回以上</strong>は中等症の基準の1項目ですが、便回数だけでは確定しません。血便、発熱、脈拍、貧血、CRPまたは赤沈を合わせて医師が判断します。</p></article>
+      <div class="severity-grid"><article class="severity-card mild"><span>軽症</span><h3>4回/日以下</h3><p>血便はなし〜わずかで、発熱・頻脈・強い貧血・炎症反応上昇がない。</p></article><article class="severity-card moderate"><span>中等症</span><h3>軽症と重症の中間</h3><p>5回/日以上、明らかな血便、37.5℃以上、脈拍90以上、Hb 10以下、CRP 3.0以上または赤沈30以上のいずれか。</p></article><article class="severity-card severe"><span>重症</span><h3>複数条件で判断</h3><p>6回/日以上かつ便の大部分が血液で、発熱または頻脈を含め、6項目中4項目以上。</p></article></div>
+      <article class="card contact-guide"><h3>受診・連絡の目安</h3><div class="contact-row emergency"><b>今すぐ相談・救急</b><p>止まらない多量出血、強い腹痛と腹部膨満、水分がとれない、意識が遠のくなど。</p></div><div class="contact-row same-day"><b>当日中に主治医へ</b><p>重症の目安、急な悪化、高熱、血便を伴う頻回便、強い脱水感があるとき。</p></div><div class="contact-row soon"><b>早めに相談</b><p>症状悪化が数日続く、血便が再び出た、普段より排便が増えた、夜間排便が続くとき。</p></div><a class="call-button" id="careTeamLink" hidden><span>登録した連絡先へ電話</span><b id="careTeamNumber"></b></a></article>
+      <article class="sources"><h3>判定の根拠</h3><p>厚生労働省の指定難病に用いられる臨床的重症度分類を参考にしています。実際の活動性・寛解は、症状だけでなく内視鏡所見や炎症マーカーなどを含めて医師が評価します。</p><ul><li><a href="https://www.nanbyou.or.jp/entry/218" target="_blank" rel="noreferrer">難病情報センター：潰瘍性大腸炎（指定難病97）</a></li><li><a href="https://www.jsibd.jp/wp-content/uploads/2025/04/117f84a076b4426ce06ec226305043df.pdf" target="_blank" rel="noreferrer">日本炎症性腸疾患協会：潰瘍性大腸炎ってなんだろう？</a></li><li><a href="https://gi.org/journals-publications/ebgi/alkazzi_aug2025/" target="_blank" rel="noreferrer">American College of Gastroenterology：2025 UC guideline summary</a></li></ul><p class="updated">医療情報確認：2026年7月</p></article>
+    </section>
+  </main>
+
+  <dialog id="settingsDialog"><form method="dialog" id="settingsForm"><div class="dialog-heading"><div><p class="eyebrow">PERSONAL SETTINGS</p><h2>自分の基準を設定</h2></div><button class="icon-button" value="cancel" type="submit" aria-label="閉じる">×</button></div><p class="dialog-description">寛解時の普段の状態を登録すると、変化を見つけやすくなります。</p><label class="field"><span>寛解時の排便回数</span><span class="number-field"><input id="baselineStools" type="number" min="0" max="20" value="2"><em>回/日</em></span></label><label class="field"><span>主治医・IBD外来の電話番号</span><input id="careTeamPhone" type="tel" inputmode="tel" placeholder="例：03-1234-5678"></label><button class="primary-button full-width" id="saveSettings" value="default" type="submit">設定を保存</button><button class="text-button danger-text" id="clearData" type="button">端末内の全記録を削除</button></form></dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div><script src="app.js" defer></script>
+</body></html>

@@ -15,10 +15,20 @@
       <div class="section-heading"><div><p class="eyebrow">DAILY CHECK</p><h2>今日の状態</h2></div><input id="recordDate" type="date" aria-label="記録日"></div>
       <form id="dailyForm">
         <article class="card form-card">
-          <div class="card-heading"><span class="step">1</span><div><h3>便の状態</h3><p>直近24時間を入力</p></div></div>
+          <div class="card-heading"><span class="step">1</span><div><h3>今日の薬</h3><p>使ったらチェック</p></div></div>
           <div class="field-grid two-columns">
-            <label class="field"><span>排便回数 <small>必須</small></span><span class="number-field"><input id="stoolCount" type="number" min="0" max="40" value="0" required><em>回/日</em></span></label>
-            <label class="field"><span>水様・泥状便</span><span class="number-field"><input id="looseCount" type="number" min="0" max="40" value="0"><em>回/日</em></span></label>
+            <label class="toggle-field"><input id="morningMeds" type="checkbox"><span><b>朝の内服薬</b><small>朝の分を飲んだ</small></span></label>
+            <label class="toggle-field"><input id="suppository" type="checkbox"><span><b>坐薬</b><small>使用した</small></span></label>
+          </div>
+        </article>
+
+        <article class="card form-card">
+          <div class="card-heading"><span class="step">2</span><div><h3>便の状態</h3><p>排便した時刻と便の状態を記録</p></div></div>
+          <div class="field stool-log-field">
+            <span>排便の記録 <small>何時にどんな便だったか</small></span>
+            <div id="stoolEventList" class="stool-log"></div>
+            <button class="secondary-button add-stool" id="addStoolEvent" type="button">＋ 排便を追加</button>
+            <p class="stool-log-note" id="stoolLogNote">今日の排便：0回</p>
           </div>
           <fieldset class="field"><legend>目で見える血便</legend><div class="choice-grid">
             <label><input type="radio" name="blood" value="0" checked><span><b>なし</b><small>（−）</small></span></label>
@@ -33,25 +43,22 @@
         </article>
 
         <article class="card form-card">
-          <div class="card-heading"><span class="step">2</span><div><h3>全身の状態</h3><p>わかる範囲で大丈夫です</p></div></div>
+          <div class="card-heading"><span class="step">3</span><div><h3>全身の状態</h3><p>わかる範囲で大丈夫です</p></div></div>
           <div class="field-grid two-columns">
             <label class="field"><span>体温</span><span class="number-field"><input id="temperature" type="number" min="34" max="43" step="0.1" placeholder="36.5"><em>℃</em></span></label>
             <label class="field"><span>安静時脈拍</span><span class="number-field"><input id="pulse" type="number" min="30" max="220" placeholder="70"><em>回/分</em></span></label>
           </div>
-          <label class="field range-field"><span>腹痛 <b id="painOutput">0 / 10</b></span><input id="pain" type="range" min="0" max="10" value="0"></label>
-          <div class="field-grid three-columns">
-            <label class="field"><span>Hb</span><span class="number-field"><input id="hb" type="number" min="2" max="25" step="0.1" placeholder="任意"><em>g/dL</em></span></label>
-            <label class="field"><span>CRP</span><span class="number-field"><input id="crp" type="number" min="0" max="100" step="0.01" placeholder="任意"><em>mg/dL</em></span></label>
-            <label class="field"><span>赤沈</span><span class="number-field"><input id="esr" type="number" min="0" max="200" step="1" placeholder="任意"><em>mm/h</em></span></label>
-          </div>
+          <fieldset class="field"><legend>腹痛</legend><div class="choice-grid duo">
+            <label><input type="radio" name="pain" value="0" checked><span><b>なし</b></span></label>
+            <label><input type="radio" name="pain" value="1"><span><b>あり</b></span></label>
+          </div></fieldset>
           <details class="optional-details"><summary>その他の記録</summary>
-            <div class="field-grid two-columns details-body"><label class="field"><span>体重</span><span class="number-field"><input id="weight" type="number" min="20" max="250" step="0.1" placeholder="任意"><em>kg</em></span></label><label class="field"><span>白血球数</span><span class="number-field"><input id="wbc" type="number" min="0" max="100000" step="100" placeholder="任意"><em>/mm³</em></span></label></div>
-            <label class="toggle-field"><input id="medicationTaken" type="checkbox" checked><span><b>処方薬を指示どおり使用した</b></span></label>
+            <div class="field-grid two-columns details-body"><label class="field"><span>体重</span><span class="number-field"><input id="weight" type="number" min="20" max="250" step="0.1" placeholder="任意"><em>kg</em></span></label></div>
           </details>
         </article>
 
         <article class="card form-card memo-card">
-          <div class="card-heading"><span class="step">3</span><div><h3>メモ</h3><p>診察時の相談と自分用を分けて保存</p></div></div>
+          <div class="card-heading"><span class="step">4</span><div><h3>メモ</h3><p>診察時の相談と自分用を分けて保存</p></div></div>
           <label class="field memo-field"><span>医師に伝えるメモ <small>診察時に見せられます</small></span><textarea id="doctorMemo" rows="4" maxlength="1000" placeholder="例：3日前から血便が増えた／夜中に2回起きる／薬について確認したいこと"></textarea></label>
           <label class="field memo-field"><span>自分用メモ <small>食事・生活・気づきなど</small></span><textarea id="personalMemo" rows="4" maxlength="1000" placeholder="例：外食後に腹痛あり／睡眠不足／仕事のストレスが強かった"></textarea></label>
         </article>
@@ -63,7 +70,7 @@
           <label><input type="checkbox" data-red-flag value="fainting"><span>意識が遠のく、ふらついて立てない</span></label>
         </div></article>
 
-        <section class="result-card" id="resultCard" aria-live="polite"><div><p class="eyebrow">TODAY'S GUIDE</p><h2 id="resultTitle">入力範囲では軽症寄り</h2><p id="resultSummary">便回数だけでなく、血便・発熱・脈拍・検査値を合わせて確認します。</p></div><div class="result-actions"><span class="status-chip" id="severityChip">参考判定</span><button class="primary-button" type="submit">今日の記録を保存</button></div></section>
+        <section class="result-card" id="resultCard" aria-live="polite"><div><p class="eyebrow">TODAY'S GUIDE</p><h2 id="resultTitle">入力範囲では軽症寄り</h2><p id="resultSummary">排便の記録だけでなく、血便・発熱・脈拍も合わせて確認します。</p></div><div class="result-actions"><span class="status-chip" id="severityChip">参考判定</span><button class="primary-button" type="submit">今日の記録を保存</button></div></section>
         <article class="card criteria-panel">
           <div class="card-heading"><div><h3>軽症・中等症・重症の基準</h3><p>厚生労働省の臨床的重症度分類をわかりやすく表示</p></div></div>
           <div class="criteria-list">
@@ -71,7 +78,7 @@
             <div class="criterion-level moderate" data-criterion-level="moderate"><b>中等症</b><p>軽症と重症の中間。排便5回/日以上、明らかな血便、37.5℃以上、脈拍90以上、Hb 10以下、赤沈30以上またはCRP 3.0以上のいずれかがあり、重症基準を満たさない。</p></div>
             <div class="criterion-level severe" data-criterion-level="severe"><b>重症</b><p>排便6回/日以上かつ便の大部分が血液で、発熱または頻脈があり、6項目中4項目以上を満たす。</p></div>
           </div>
-          <p class="criteria-note">検査項目が未入力の場合は参考判定です。正式な重症度は医師が判断します。</p>
+          <p class="criteria-note">採血などの検査値はこのアプリでは扱わないため参考判定です。正式な重症度は医師が判断します。</p>
         </article>
       </form>
     </section>
